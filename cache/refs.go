@@ -277,9 +277,6 @@ func (cr *cacheRecord) walkUniqueAncestors(f func(*cacheRecord) error) error {
 }
 
 func (cr *cacheRecord) isLazy(ctx context.Context) (bool, error) {
-	if !cr.getBlobOnly() {
-		return false, nil
-	}
 	dgst := cr.getBlob()
 	// special case for moby where there is no compressed blob (empty digest)
 	if dgst == "" {
@@ -290,6 +287,9 @@ func (cr *cacheRecord) isLazy(ctx context.Context) (bool, error) {
 		return true, nil
 	} else if err != nil {
 		return false, err
+	}
+	if !cr.getBlobOnly() {
+		return false, nil
 	}
 
 	// If the snapshot is a remote snapshot, this layer is lazy.
